@@ -1,21 +1,33 @@
 {
-  "name": "cli_weather",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "start": "tsx src/index.ts"
-  },
-  "keywords": [],
-  "author": "",
-  "type": "module",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "dotenv": "^17.4.2"
-  },
-  "devDependencies": {
-    "@types/node": "^22.20.2",
-    "tsx": "^4.23.13",
-    "typescript": "^7.0.2"
-  }
+	"name": "cli_weather",
+	"version": "1.0.0",
+	"main": "index.js",
+	"scripts": {
+		"start": "tsx src/index.ts",
+		"lint": "npx @biomejs/biome check",
+		"format": "npx @biomejs/biome check --write",
+		"typecheck": "tsc --noEmit",
+		"prepare": "husky"
+	},
+	"lint-staged": {
+		"*.ts": [
+			"biome check --no-errors-on-unmatched --files-ignore-unknown=true"
+		]
+	},
+	"keywords": [],
+	"author": "",
+	"type": "module",
+	"license": "ISC",
+	"description": "",
+	"dependencies": {
+		"dotenv": "^17.4.2"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.5.13",
+		"@types/node": "^22.20.2",
+		"husky": "^9.1.7",
+		"lint-staged": "^16.4.0",
+		"tsx": "^4.23.13",
+		"typescript": "^7.0.2"
+	}
 }
