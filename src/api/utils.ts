@@ -9,7 +9,7 @@ export const fetchWrapper = async <T>(url: URL): Promise<T> => {
 	);
 	let responce: Response;
 	try {
-		responce = await fetch(url);
+		responce = await fetch(url, { signal: controller.signal });
 		clearTimeout(timeoutId);
 	} catch (error) {
 		if (!(error instanceof Error)) throw error;

@@ -1,4 +1,4 @@
-import { getForecast, getLatLong } from './api/index.ts';
+import { Command, InvalidArgumentError } from 'commander';
 import {
 	HttpError,
 	JSONError,
@@ -6,18 +6,62 @@ import {
 	NetworkError,
 	TimeoutError,
 } from './error.ts';
+import { formatter } from './format/index.ts';
+import { getCityAndForecastData } from './services/index.ts';
+import type { forecastRespondType } from './types.ts';
 
-try {
-	const data = await getLatLong('Москва');
-	if (data.results) {
-		const result = data.results[0];
-		console.log(await getForecast(result.latitude, result.longitude));
-	} else throw new MissingCityError('Город не найден');
-} catch (error) {
-	if (error instanceof TimeoutError) console.log(error.message);
-	else if (error instanceof NetworkError) console.log(error.message);
-	else if (error instanceof JSONError) console.log(error.message);
-	else if (error instanceof MissingCityError) console.log(error.message);
-	else if (error instanceof HttpError) console.log(error.status, error.message);
-	process.exit(1);
+const program = new Command();
+
+const parseDays = (value: string) => {
+	const day = Number.parseInt(value, 10);
+	if (Number.isNaN(day)) throw new InvalidArgumentError('Не число.');
+	if (day >= 1 && day <= 7) {
+		return day;
+	} else
+		throw new InvalidArgumentError(
+			'Количество дней должно быть число между 1 и 7.',
+		);
+};
+
+const parseCity = (value: string) => {
+	if (value === '')
+		throw new InvalidArgumentError('Введено пустое значение города.');
+	const citys = value.split(',');
+	return citys;
+};
+
+program
+	.requiredOption('--city <value>', 'обязательный параметр', parseCity)
+	.option(
+		'--days <number>',
+		'необязательный параметр с дефолтом',
+		parseDays,
+		3,
+	);
+
+program.parse();
+
+const { days, city } = program.opts();
+
+const results = await Promise.allSettled<
+	Promise<{
+		forecastData: forecastRespondType;
+		country: string;
+		name: string;
+	}>
+>(city.map(async (city: string) => getCityAndForecastData(city, days)));
+
+for (const result of results) {
+	if (result.status === 'rejected') {
+		const error = result.reason;
+		if (error instanceof TimeoutError) console.log(error.message);
+		else if (error instanceof NetworkError) console.log(error.message);
+		else if (error instanceof JSONError) console.log(error.message);
+		else if (error instanceof MissingCityError) console.log(error.message);
+		else if (error instanceof HttpError)
+			console.log(error.status, error.message);
+		process.exit(1);
+	} else {
+		formatter(result);
+	}
 }
