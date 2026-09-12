@@ -32,16 +32,12 @@ const parseCity = (value: string) => {
 
 program
 	.requiredOption('--city <value>', 'обязательный параметр', parseCity)
-	.option(
-		'--days <number>',
-		'необязательный параметр с дефолтом',
-		parseDays,
-		3,
-	);
+	.option('--days <number>', 'необязательный параметр с дефолтом', parseDays, 3)
+	.option('--no-cache', 'необязательный параметр');
 
 program.parse();
 
-const { days, city } = program.opts();
+const { days, city, cache } = program.opts();
 
 const results = await Promise.allSettled<
 	Promise<{
@@ -49,7 +45,7 @@ const results = await Promise.allSettled<
 		country: string;
 		name: string;
 	}>
->(city.map(async (city: string) => getCityAndForecastData(city, days)));
+>(city.map(async (city: string) => getCityAndForecastData(city, days, cache)));
 
 for (const result of results) {
 	if (result.status === 'rejected') {
