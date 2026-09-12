@@ -9,7 +9,8 @@
 		// See also https://aka.ms/tsconfig/module
 		"module": "nodenext",
 		"target": "esnext",
-		"types": [],
+		"lib": ["esnext"],
+		"types": ["node"],
 		// For nodejs:
 		// "lib": ["esnext"],
 		// "types": ["node"],
@@ -17,8 +18,11 @@
 
 		// Other Outputs
 		"sourceMap": true,
-		"declaration": true,
-		"declarationMap": true,
+		"declaration": false,
+		"declarationMap": false,
+		"noEmit": true,
+		"emitDeclarationOnly": false,
+		"allowImportingTsExtensions": true,
 
 		// Stricter Typechecking Options
 		"noUncheckedIndexedAccess": true,
