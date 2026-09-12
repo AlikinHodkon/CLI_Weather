@@ -6,7 +6,9 @@ import {
 	NetworkError,
 	TimeoutError,
 } from './error.ts';
+import { formatter } from './format/index.ts';
 import { getCityAndForecastData } from './services/index.ts';
+import type { forecastRespondType } from './types.ts';
 
 const program = new Command();
 
@@ -41,9 +43,13 @@ program.parse();
 
 const { days, city } = program.opts();
 
-const results = await Promise.allSettled(
-	city.map(async (city: string) => getCityAndForecastData(city, days)),
-);
+const results = await Promise.allSettled<
+	Promise<{
+		forecastData: forecastRespondType;
+		country: string;
+		name: string;
+	}>
+>(city.map(async (city: string) => getCityAndForecastData(city, days)));
 
 for (const result of results) {
 	if (result.status === 'rejected') {
@@ -56,6 +62,6 @@ for (const result of results) {
 			console.log(error.status, error.message);
 		process.exit(1);
 	} else {
-		console.log(result); // вызов formatterа
+		formatter(result);
 	}
 }
