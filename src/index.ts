@@ -14,6 +14,15 @@ import type { forecastRespondType } from './types.ts';
 
 dns.setDefaultResultOrder('ipv4first');
 
+const requiredEnvVars = ['BASE_GEOCODING_URL', 'BASE_FORECAST_URL'];
+
+for (const name of requiredEnvVars) {
+	if (!process.env[name]) {
+		console.error(`Отсутствует обязательная переменная окружения: ${name}`);
+		process.exit(1);
+	}
+}
+
 const program = new Command();
 
 program
