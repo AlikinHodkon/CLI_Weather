@@ -51,6 +51,11 @@ for (const result of results) {
 		else if (error instanceof MissingCityError) console.log(error.message);
 		else if (error instanceof HttpError)
 			console.log(error.status, error.message);
+		else
+			console.log(
+				'Неизвестная ошибка:',
+				error instanceof Error ? error.message : error,
+			);
 		process.exit(1);
 	} else {
 		formatter(result);
