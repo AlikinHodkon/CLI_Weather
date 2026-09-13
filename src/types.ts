@@ -21,7 +21,7 @@ export type forecastRespondType = {
 };
 
 export type geocodingRespondType = {
-	results: [
+	results?: [
 		{
 			id: number;
 			name: string;
