@@ -17,7 +17,6 @@ export const fetchWrapper = async <T>(url: URL): Promise<T> => {
 		if (!(error instanceof Error)) throw error;
 		if (error.name === 'AbortError')
 			throw new TimeoutError('Превышено время ожидания');
-		else if (error.name === 'SyntaxError') throw new JSONError('Битый JSON');
 		throw new NetworkError('Проблема с сетью');
 	}
 	if (!responce.ok) {
@@ -26,5 +25,9 @@ export const fetchWrapper = async <T>(url: URL): Promise<T> => {
 		}
 		throw new HttpError(responce.status, 'Проблема со стороны клиента');
 	}
-	return responce.json() as T;
+	try {
+		return (await responce.json()) as T;
+	} catch {
+		throw new JSONError('Битый JSON');
+	}
 };
