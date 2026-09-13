@@ -1,3 +1,4 @@
+import dns from 'node:dns';
 import { Command } from 'commander';
 import { parseCity, parseDays } from './cli/index.ts';
 import {
@@ -10,6 +11,8 @@ import {
 import { formatter } from './format/index.ts';
 import { getCityAndForecastData } from './services/index.ts';
 import type { forecastRespondType } from './types.ts';
+
+dns.setDefaultResultOrder('ipv4first');
 
 const program = new Command();
 
