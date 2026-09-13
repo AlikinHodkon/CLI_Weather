@@ -5,7 +5,9 @@ export const fetchWrapper = async <T>(url: URL): Promise<T> => {
 	const controller = new AbortController();
 	const timeoutId = setTimeout(
 		() => controller.abort(),
-		Number(process.env.TIMEOUT),
+		Number.isNaN(Number(process.env.TIMEOUT))
+			? 5000
+			: Number(process.env.TIMEOUT),
 	);
 	let responce: Response;
 	try {
