@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<title>Просмотр отчёта — CLI Weather Digest</title>
+	<style>
+		body { font-family: sans-serif; margin: 2rem; }
+		#output span { display: block; margin-bottom: 0.4rem; }
+		table { border-collapse: collapse; margin-top: 1rem; }
+		th, td { border: 1px solid #ccc; padding: 0.5rem 1rem; text-align: left; }
+		th { background: #f0f0f0; }
+	</style>
+</head>
+<body>
+	<h1>Просмотр отчёта</h1>
+	<p>Выберите JSON-файл из каталога <code>reports/</code>:</p>
+	<input type="file" id="fileInput" accept=".json">
+
+	<div id="output"></div>
+
+	<script>
+		"use strict"
+		const addSpan = (text, parentElement) => {
+			const span = document.createElement('span')
+			span.innerText = text
+			parentElement.appendChild(span)
+		}
+
+		const buildTable = (daily, dailyUnits) => {
+			const table = document.createElement('table')
+			const thead = document.createElement('thead')
+			const headRow = document.createElement('tr');
+			['Дата', 'Макс. температура', 'Мин. температура', 'Осадки'].forEach((title) => {
+				const th = document.createElement('th')
+				th.innerText = title
+				headRow.appendChild(th)
+			})
+			thead.appendChild(headRow)
+			table.appendChild(thead)
+
+			const tbody = document.createElement('tbody')
+			for (let i = 0; i < daily.time.length; i++) {
+				const row = document.createElement('tr')
+				const cells = [
+					daily.time[i],
+					`${daily.temperature_2m_max[i]} ${dailyUnits.temperature_2m_max}`,
+					`${daily.temperature_2m_min[i]} ${dailyUnits.temperature_2m_min}`,
+					`${daily.precipitation_sum[i]} ${dailyUnits.precipitation_sum}`,
+				]
+				cells.forEach((text) => {
+					const td = document.createElement('td')
+					td.innerText = text
+					row.appendChild(td)
+				})
+				tbody.appendChild(row)
+			}
+			table.appendChild(tbody)
+			return table
+		}
+
+		document.getElementById('fileInput').addEventListener('change', (event) => {
+			const file = event.target.files[0];
+			if (!file) return;
+
+			const reader = new FileReader();
+			reader.onload = () => {
+				const data = JSON.parse(reader.result)
+				const forecastData = data.forecastData
+
+				const output = document.querySelector('#output')
+				output.innerHTML = ''
+
+				const div = document.createElement('div')
+				addSpan(`Город: ${data.name}`, div)
+				addSpan(`Страна: ${data.country}`, div)
+				addSpan(`Широта: ${forecastData.latitude}`, div)
+				addSpan(`Долгота: ${forecastData.longitude}`, div)
+				output.appendChild(div)
+
+				output.appendChild(buildTable(forecastData.daily, forecastData.daily_units))
+			};
+			reader.readAsText(file);
+		});
+	</script>
+</body>
+</html>
