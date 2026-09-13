@@ -1,0 +1,6 @@
+services:
+  weather:
+    build: .
+    env_file: .env
+    volumes:
+      - ./reports:/app/reports
