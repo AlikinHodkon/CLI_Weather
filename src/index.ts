@@ -1,4 +1,5 @@
-import { Command, InvalidArgumentError } from 'commander';
+import { Command } from 'commander';
+import { parseCity, parseDays } from './cli/index.ts';
 import {
 	HttpError,
 	JSONError,
@@ -11,24 +12,6 @@ import { getCityAndForecastData } from './services/index.ts';
 import type { forecastRespondType } from './types.ts';
 
 const program = new Command();
-
-const parseDays = (value: string) => {
-	const day = Number.parseInt(value, 10);
-	if (Number.isNaN(day)) throw new InvalidArgumentError('Не число.');
-	if (day >= 1 && day <= 7) {
-		return day;
-	} else
-		throw new InvalidArgumentError(
-			'Количество дней должно быть число между 1 и 7.',
-		);
-};
-
-const parseCity = (value: string) => {
-	if (value === '')
-		throw new InvalidArgumentError('Введено пустое значение города.');
-	const citys = value.split(',');
-	return citys;
-};
 
 program
 	.requiredOption('--city <value>', 'обязательный параметр', parseCity)
